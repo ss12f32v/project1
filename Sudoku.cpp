@@ -2,17 +2,31 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <unistd.h>
+#include <string> 
+#include <time.h>   
 #include "Sudoku.h"
 using namespace std;
 
-
+    
     int a[10][10],b[10][10],ans,TIME;
-	Sudoku::Sudoku()
-	{
-		ans=0;
-		TIME=0;
-	}
-    void Sudoku::GiveQuestion()
+    Sudoku::Sudoku()
+    {
+        ans=0;
+        TIME=0;
+    }
+    void Sudoku::printBoard(){
+        int i,j;
+        for(i=0;i<9;i++){
+            for(j=0;j<9;j++){
+                cout << a[i][j];
+                if (j < 8)
+                    cout << " ";
+            }
+            cout << endl;
+        }    
+    }
+    void Sudoku::giveQuestion()
     {
         srand(time(NULL));
         int j;
@@ -41,25 +55,24 @@ using namespace std;
         else if( rand_seed == 8 ) print = o;
         else if( rand_seed == 9 ) print = p;
         else if( rand_seed == 10 ) print = z;
-        for (j=0;j<=80;j++)
-        {
-            cout << print[j] ;
-            if ( ( j%9 ) == 8 ) cout << endl ;
+        for (int j=0;j<81;j++){
+            cout << print[j];
+            if ( ( j % 9 ) == 8 ) cout << endl ;
             else cout << " " ;
         }
     }
-    void Sudoku::ReadIn()
+    void Sudoku::readIn()
     {
         int i,j;
-        for(i=1;i<=9;i++)
-            for(j=1;j<=9;j++){
+        for(i=0;i<9;i++)
+            for(j=0;j<9;j++){
                 a[i][j] = 0;
                 b[i][j] = 0;
             }
 
-        for(i=1;i<=9;i++)
+        for(i=0;i<9;i++)
         {
-            for(j=1;j<=9;j++)
+            for(j=0;j< 9;j++)
             {
                 cin >> a[i][j];
             }
@@ -81,42 +94,12 @@ using namespace std;
             for(int i=0;i<9;i++){
                 for(int j=0;j<3;j++){
                     tmp = a[i][j];
-                    a[i][j] = a[i][j+3];
-                    a[i][j+3] = tmp;
-                }
-            }
-        }
-        else if((row_a==0 && row_b==2) || (row_a==2 && row_b==0)){
-            for(int i=0;i<9;i++){
-                for(int j=0;j<3;j++){
-                    tmp = a[i][j];
-                    a[i][j] = a[i][j+6];
-                    a[i][j+6] = tmp;
-                }
-            }         
-        }
-        else if((row_a==1 && row_b==2) || (row_a==2 && row_b==1)){
-            for(int i=0;i<9;i++){
-                for(int j=3;j<6;j++){
-                    tmp = a[i][j];
-                    a[i][j] = a[i][j+3];
-                    a[i][j+3] = tmp;
-                }
-            }                      
-        }
-    }
-    void Sudoku::changeCol(int col_a, int col_b){
-        int tmp = 0;
-        if((col_a == 0 && col_b==1) || (col_a==1 && col_b==0)){
-            for(int j=0;j<9;j++){
-                for(int i=0;i<3;i++){
-                    tmp = a[i][j];
                     a[i][j] = a[i+3][j];
                     a[i+3][j] = tmp;
                 }
             }
         }
-        else if((col_a==0 && col_b==2) || (col_a==2 && col_b==0)){
+        else if((row_a==0 && row_b==2) || (row_a==2 && row_b==0)){
             for(int j=0;j<9;j++){
                 for(int i=0;i<3;i++){
                     tmp = a[i][j];
@@ -125,7 +108,7 @@ using namespace std;
                 }
             }         
         }
-        else if((col_a==1 && col_b==2) || (col_a==2 && col_b==1)){
+        else if((row_a==1 && row_b==2) || (row_a==2 && row_b==1)){
             for(int j=0;j<9;j++){
                 for(int i=3;i<6;i++){
                     tmp = a[i][j];
@@ -135,14 +118,44 @@ using namespace std;
             }                      
         }
     }
+    void Sudoku::changeCol(int col_a, int col_b){
+        int tmp = 0;
+        if((col_a == 0 && col_b==1) || (col_a==1 && col_b==0)){
+            for(int i=0;i<9;i++){
+                for(int j=0;j<3;j++){
+                    tmp = a[i][j];
+                    a[i][j] = a[i][j+3];
+                    a[i][j+3] = tmp;
+                }
+            }
+        }
+        else if((col_a==0 && col_b==2) || (col_a==2 && col_b==0)){
+            for(int i=0;i<9;i++){
+                for(int j=0;j<3;j++){
+                    tmp = a[i][j];
+                    a[i][j] = a[i][j+6];
+                    a[i][j+6] = tmp;
+                }
+            }         
+        }
+        else if((col_a==1 && col_b==2) || (col_a==2 && col_b==1)){
+            for(int i=0;i<9;i++){
+                for(int j=3;j<6;j++){
+                    tmp = a[i][j];
+                    a[i][j] = a[i][j+3];
+                    a[i][j+3] = tmp;
+                }
+            }                      
+        }
+    }
 
     void Sudoku::rotate(int n){
         int tmp[9][9]={0};
         int number=n%4;
         for(int k=0;k<number;k++){
-            for(int j=0;j<9;j++)
-                for(int i=0;i<9;i++)
-                    tmp[8 - j][i] = a[i][j]; 
+            for(int i=0;i<9;i++)
+                for(int j=0;j<9;j++)
+                    tmp[i][8 - j] = a[i][j]; 
         }                        
         for(int i=0;i<9;i++){
             for(int j=0;j<9;j++){
@@ -155,14 +168,14 @@ using namespace std;
             if(n==0){
                 for(int i=0;i<9;i++){
                     for(int j=0;j<9;j++){
-                        tmp[i][j]=a[i][8-j];
+                        tmp[i][j]=a[8 - i][j];
                     }
                 }
             }
             else if(n==1){
                 for(int i=0;i<9;i++){
                     for(int j=0;j<9;j++){
-                        tmp[i][j]=a[8-i][j];
+                        tmp[i][j]=a[i][8 - j];
                     }
                 }
             }
@@ -172,15 +185,11 @@ using namespace std;
                 }
             }
  
-      }
+    }
 
     void  Sudoku::transform(){
         change();
-        for(int i = 0;i < 9;i++){
-            for(int j = 0;j < 9;j++)
-                printf("%d ",a[i][j]);
-            printf("\n");
-        }        
+        printBoard();
     }
     void Sudoku::change(){
         srand(time(NULL));
@@ -191,12 +200,15 @@ using namespace std;
         flip(rand()%2);
 
     }
-    void Sudoku::Solve()
+    void Sudoku::solve()
     {
+        struct timespec yohua;
+        yohua.tv_sec = 0;
+        yohua.tv_nsec = 2000;
         int num,i,j,m,n,zero=0,zerox=0,zero_save;
-        for(i=1;i<=9;i++)
+        for(i=0;i<9;i++)
         {
-            for(j=1;j<=9;j++)
+            for(j=0;j<9;j++)
             {
                 if(a[i][j] == 0)
                 {
@@ -217,33 +229,36 @@ using namespace std;
                 cout << "2";
                 exit(0);
             }
-            for(i=1;i<=9;i++)
+            for(i=0;i<9;i++)
             {
-                for(j=1;j<=9;j++)
+                for(j=0;j<9;j++)
                 {
                     b[i][j] = a[i][j];
                 }
             }
             return ;
         }
-        for(i=1;i<=9;i++)
+        string str1; 
+        for(i=0;i<9;i++)
         {
-            for(j=1;j<=9;j++)
+            for(j=0;j<9;j++)
             {
                 if(a[i][j] == 0)
                 {
+
                     for(num=1;num<=9;num++)
                     {
+                        nanosleep(&yohua,NULL);
                         if( check(num,i,j) == 0 )
                         {
                             a[i][j] = num;
-                            Solve();
+                            solve();
                             a[i][j] = 0;
                         }
                     }
-                    for(m=1;m<=9;m++)
+                    for(m=0;m<9;m++)
                     {
-                        for(n=1;n<=9;n++)
+                        for(n=0;n<9;n++)
                         {
                             if(a[m][n] == 0)
                             {
@@ -256,12 +271,12 @@ using namespace std;
                         if(ans == 1)
                         {
                             cout << "1" << endl ;
-                            for(i=1;i<=9;i++)
+                            for(i=0;i<9;i++)
                             {
-                                for(j=1;j<=9;j++)
+                                for(j=0;j<9;j++)
                                 {
                                     cout << b[i][j];
-                                    if (j < 9)
+                                    if (j < 8)
                                     {
                                         cout << " ";
                                     }
@@ -271,10 +286,10 @@ using namespace std;
                         }
                         else if ( ans == 0)
                         {
-                            cout << "0" ;
+                            cout << "0" << endl;
                         }
                     }
-                    return; /////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    return; /////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
                 }
             }
         }
@@ -283,31 +298,31 @@ using namespace std;
     int Sudoku::check(int num,int i,int j)
     {
         int m,n;
-        for(m=1;m<=9;m++)
+        for(m=0;m<9;m++)
         {
             if(num == a[i][m]) return 1;
         }
-        for(m=1;m<=9;m++)
+        for(m=0;m<9;m++)
         {
             if(num == a[m][j]) return 1;
         }
-        if(j == 1 || j == 4 || j == 7 )
+        if(j == 0 || j == 3 || j == 6 )
         {
             for(n=j+1;n<=j+2;n++)
             {
-                if(i == 1 || i == 4 || i == 7 )
+                if(i == 0 || i == 3 || i == 6 )
                 {
                     for(m=i+1;m<=i+2;m++)
                     {
                         if(num == a[m][n]) return 1;
                     }
                 }
-                if(i == 2 || i == 5 || i == 8 )
+                if(i == 1 || i == 4 || i == 8 )
                 {
                     if(num == a[i+1][n]) return 1;
                     if(num == a[i-1][n]) return 1;
                 }
-                if(i == 3 || i == 6 || i == 9 )
+                if(i == 2 || i == 5 || i == 8  )
                 {
                     for(m=i-2;m<=i-1;m++)
                     {
@@ -316,9 +331,9 @@ using namespace std;
                 }
             }
         }
-        if(j == 2 || j == 5 || j == 8 )
+        if(j == 1 || j == 4 || j == 7 )
         {
-            if(i == 1 || i == 4 || i == 7 )
+            if(i == 0 || i == 3 || i == 6 )
             {
                 for(m=i+1;m<=i+2;m++)
                 {
@@ -326,14 +341,14 @@ using namespace std;
                     if(num == a[m][j+1]) return 1;
                 }
             }
-            if(i == 2 || i == 5 || i == 8 )
+            if(i == 1 || i == 4 || i == 7 )
             {
                 if(num == a[i-1][j-1]) return 1;
                 if(num == a[i-1][j+1]) return 1;
                 if(num == a[i+1][j-1]) return 1;
                 if(num == a[i+1][j+1]) return 1;
             }
-             if(i == 3 || i == 6 || i == 9 )
+             if(i == 2 || i == 5 || i ==8 )
             {
                 for(m=i-2;m<=i-1;m++)
                 {
@@ -342,23 +357,23 @@ using namespace std;
                 }
             }
         }
-        if(j == 3 || j == 6 || j == 9 )
+        if(j == 2 || j == 5 || j == 8 )
         {
             for(n=j-2;n<=j-1;n++)
             {
-                if(i == 1 || i == 4 || i == 7 )
+                if(i == 0 || i == 3 || i == 6 )
                 {
                     for(m=i+1;m<=i+2;m++)
                     {
                         if(num == a[m][n]) return 1;
                     }
                 }
-                if(i == 2 || i == 5 || i == 8 )
+                if(i == 1 || i == 4 || i == 7 )
                 {
                     if(num == a[i+1][n]) return 1;
                     if(num == a[i-1][n]) return 1;
                 }
-                if(i == 3 || i == 6 || i == 9 )
+                if(i == 2 || i == 5 || i == 8 )
                 {
                     for(m=i-2;m<=i-1;m++)
                     {
@@ -367,5 +382,5 @@ using namespace std;
                 }
             }
         }
-        else return 0;
+         return 0;
     }
