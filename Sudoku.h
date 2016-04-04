@@ -10,9 +10,10 @@ public:
 
     int a[10][10],b[10][10],ans,TIME;
 	Sudoku();
-    void GiveQuestion();
-    void ReadIn();
-    void Solve();
+    void giveQuestion();
+    void readIn();
+    void printBoard();
+    void solve();
     void transform();
     void change();
     void flip(int n);
